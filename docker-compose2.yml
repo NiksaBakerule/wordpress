@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  webserver-a:
+    image: nginx:1.15.12-alpine
+    container_name: webserver-a
+    restart: unless-stopped
+    ports:
+      - "81:80"
+    volumes:
+      - ./nginx-conf/nginx-a.conf:/etc/nginx/conf.d/nginx.conf
+      - ./nginx-conf/site-a.html:/usr/share/nginx/html/index.html
+    networks:
+      - app-network
+
+  webserver-b:
+    image: nginx:1.15.12-alpine
+    container_name: webserver-b
+    restart: unless-stopped
+    ports:
+      - "82:80"
+    volumes:
+      - ./nginx-conf/nginx-b.conf:/etc/nginx/conf.d/nginx.conf
+      - ./nginx-conf/site-b.html:/usr/share/nginx/html/index.html
+    networks:
+      - app-network
+
+  haproxy:
+    image: haproxy:2.7
+    volumes:
+      - ./haproxy-conf/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    ports:
+      - "80:80"
+      - "70:70"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+
